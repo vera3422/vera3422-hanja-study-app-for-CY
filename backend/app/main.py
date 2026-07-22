@@ -1,19 +1,40 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.services.data_loader import load_hanja_data
+from app.services.grade_range import get_grade_range
+from app.routers.questions import router as questions_router
+
 app = FastAPI(title="한자능력검정 학습 앱")
 
-# CORS 설정 (프론트엔드와 연결하기 위함)
+# CORS 설정 (프론트엔드에서 호출가능하도록 해줌)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 나중에 Vercel 주소로 제한
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "*"],  # * 추가
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.get("/")
-async def root():
-    return {"message": "한자 학습 앱 API 서버가 정상 작동 중입니다!"}
+# 라우터 등록 (한 번만)
+app.include_router(questions_router)
 
-print("한자 학습 앱 백엔드 시작!")
+# 데이터 로드
+df, grades = load_hanja_data()
+
+@app.get("/")
+def root():
+    return {"message": "한자 학습 앱 API 서버가 정상 작동 중입니다."}
+
+@app.get("/api/grade-range")
+def get_grade_range_api(selected: str, mode: int = 1):
+    """출제 범위 반환"""
+    return {
+        "selected": selected,
+        "mode": mode,
+        "grades": get_grade_range(selected, mode)
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

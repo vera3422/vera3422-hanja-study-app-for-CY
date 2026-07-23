@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react'; //useEffect
 import { apiClient, type QuestionResponse } from '../../api/apiClient';
 
 interface MethodProps {

@@ -28,7 +28,7 @@ export default function Method21({ selectedLevel, onBackToMenu }: MethodProps) {
     }
   };
 
-  const handleAnswer = async (submitted: string) => {
+  const handleAnswer = async (_submitted: string) => {
     // TODO: submitAnswer 연동
     setFeedback({
       message: "정답입니다! (2-1 스켈레톤)",
